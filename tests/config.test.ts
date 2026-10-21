@@ -176,6 +176,33 @@ describe("loadConfig — default values for unset optional settings", () => {
   });
 });
 
+describe("loadConfig — HTTP port and request limit ranges (#551)", () => {
+  it("accepts the smallest valid bounds and largest valid port", () => {
+    withEnv({ PORT: "65535", BODY_LIMIT: "1", QUERY_STRING_LIMIT: "1" }, () => {
+      expect(loadConfig()).toMatchObject({
+        port: 65535,
+        bodyLimit: 1,
+        queryStringLimit: 1,
+      });
+    });
+  });
+
+  it.each(["0", "65536", "99999"])("rejects invalid PORT=%s at startup", (value) => {
+    withEnv({ PORT: value }, () => {
+      expect(() => loadConfig()).toThrow(/PORT.*between 1 and 65535/);
+    });
+  });
+
+  it.each(["BODY_LIMIT", "QUERY_STRING_LIMIT"] as const)(
+    "rejects %s=0 rather than disabling the safety limit",
+    (name) => {
+      withEnv({ [name]: "0" }, () => {
+        expect(() => loadConfig()).toThrow(new RegExp(`${name}.*at least 1`));
+      });
+    },
+  );
+});
+
 describe("loadConfig — STREAM_SUMMARY_CACHE_TTL_MS", () => {
   it("accepts a configured non-negative TTL", () => {
     withEnv({ STREAM_SUMMARY_CACHE_TTL_MS: "2500" }, () => {
