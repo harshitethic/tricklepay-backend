@@ -78,7 +78,7 @@ dd if=/dev/zero bs=1M count=2 | curl -X POST \
 
 ## Query String Limit
 
-The query string limit applies to the portion of the URL after the `?` character, including all parameters and their values.
+The query string limit applies to everything after the **first** `?` character, including all parameters, values, and any subsequent `?` characters.
 
 ### When the Limit is Exceeded
 
