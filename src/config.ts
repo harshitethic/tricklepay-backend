@@ -45,6 +45,20 @@ function integer(name: string, fallback: number): number {
   return parsed;
 }
 
+// For settings where zero would disable a safety limit (or an invalid port
+// would only fail later during listen), keep their bounds explicit at startup.
+function boundedInteger(name: string, fallback: number, min: number, max?: number): number {
+  const value = integer(name, fallback);
+  if (value < min || (max !== undefined && value > max)) {
+    throw new Error(
+      max === undefined
+        ? `Environment variable ${name} must be at least ${min}`
+        : `Environment variable ${name} must be between ${min} and ${max}`,
+    );
+  }
+  return value;
+}
+
 // Parses a boolean flag. Only explicit true/false spellings are accepted so a
 // typo fails at startup instead of silently flipping a security-relevant
 // setting, such as whether the interactive docs are served.
@@ -238,7 +252,7 @@ export function loadConfig(): Config {
     DEFAULT_READINESS_RETRY_AFTER_SECONDS,
   );
 
-  const port = integer("PORT", 3000);
+  const port = boundedInteger("PORT", 3000, 1, 65535);
   const host = optional("HOST", "0.0.0.0");
 
   return {
@@ -266,8 +280,8 @@ export function loadConfig(): Config {
       "STREAM_SUMMARY_CACHE_TTL_MS",
       DEFAULT_STREAM_SUMMARY_CACHE_TTL_MS,
     ),
-    bodyLimit: integer("BODY_LIMIT", 1048576), // 1MB default
-    queryStringLimit: integer("QUERY_STRING_LIMIT", 2048), // 2KB default
+    bodyLimit: boundedInteger("BODY_LIMIT", 1048576, 1), // 1MB default
+    queryStringLimit: boundedInteger("QUERY_STRING_LIMIT", 2048, 1), // 2KB default
     compressionThresholdBytes: integer(
       "COMPRESSION_THRESHOLD_BYTES",
       DEFAULT_COMPRESSION_THRESHOLD_BYTES,
