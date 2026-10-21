@@ -47,6 +47,29 @@ describe("buildServer (split setup #240)", () => {
     expect(body.error).toBe("query string too long");
   });
 
+  it("counts every character after the first question mark, including later question marks", async () => {
+    const app = await buildServer({ queryStringLimit: 10 });
+    try {
+      const allowed = await app.inject({
+        method: "GET",
+        url: "/health?x?" + "a".repeat(8),
+      });
+      expect(allowed.statusCode).toBe(200);
+
+      const tooLong = await app.inject({
+        method: "GET",
+        url: "/health?x?" + "a".repeat(9),
+      });
+      expect(tooLong.statusCode).toBe(400);
+      expect(tooLong.json()).toMatchObject({
+        code: "VALIDATION_ERROR",
+        error: "query string too long",
+      });
+    } finally {
+      await app.close();
+    }
+  });
+
   it("redacts credentials in error messages before sending to the client", async () => {
     const app = await buildServer();
     app.get("/fail", async () => {
