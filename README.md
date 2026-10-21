@@ -1017,14 +1017,14 @@ current template — copy it and fill in the required values.
 | `STREAM_CONTRACT_ID` | **Yes** | - | Deployed Soroban contract address. |
 | `NETWORK` | No | `testnet` | Stellar network (`testnet` or `mainnet`). |
 | `SOROBAN_RPC_URL` | No | *network dependent* | Soroban RPC endpoint. Defaults to the public endpoint for the selected network. Plain `http://` is only accepted for `localhost`, `127.0.0.0/8`, or `::1`/`[::1]`; any other host must use `https://` or startup fails — see [Plain HTTP is only allowed for local RPC hosts](docs/local-network.md#plain-http-is-only-allowed-for-local-rpc-hosts). |
-| `PORT` | No | `3000` | HTTP server listen port. |
+| `PORT` | No | `3000` | HTTP server listen port (1-65535). |
 | `HOST` | No | `0.0.0.0` | HTTP server bind address. |
 | `CORS_ORIGIN` | No | - | Allowed browser origin for the web client. |
 | `PUBLIC_BASE_URL` | No | `http://<HOST>:<PORT>` | Base URL advertised in the generated OpenAPI document's `servers` entry. Defaults to a URL derived from `HOST` and `PORT`. |
 | `LOG_LEVEL` | No | `info` | Log verbosity (`trace`, `debug`, `info`, `warn`, `error`, `fatal`, `silent`). |
 | `LOG_PRETTY` | No | - | Set to `true` for human-readable development logs; requires the `pino-pretty` dev dependency. Output stays JSON when unset. |
-| `BODY_LIMIT` | No | `1048576` | Largest accepted request body in bytes. |
-| `QUERY_STRING_LIMIT` | No | `2048` | Longest accepted URL query string in bytes. |
+| `BODY_LIMIT` | No | `1048576` | Largest accepted request body in bytes (minimum 1). |
+| `QUERY_STRING_LIMIT` | No | `2048` | Longest accepted URL query string in bytes (minimum 1). |
 | `ENABLE_DOCS_UI` | No | `true` | Serve the interactive Swagger UI at `/docs`. Set to `false` to disable the page and its static assets while `/docs/json` and `/docs/yaml` stay available. Accepts `true/false` (also `1/0`, `yes/no`, `on/off`); anything else fails startup. |
 | `METRICS_TOKEN` | No | - | Bearer token required on `/metrics` when set; unset keeps the endpoint unauthenticated. Only send it over TLS and keep the recommended network restriction. |
 | `COMPRESSION_THRESHOLD_BYTES` | No | `1024` | Responses at least this many bytes are compressed when the client accepts `gzip` or `br`. Smaller responses are sent uncompressed. |
